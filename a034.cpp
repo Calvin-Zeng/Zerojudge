@@ -12,32 +12,20 @@ string int2str(int i) { //intÂàstring
 	ss >> convert_str;
 	return convert_str;
 }
+string tenCarry2twoCarry(int intput) {
+	int output;
+	if(intput==1)
+		return "1";
+	else
+		return tenCarry2twoCarry(intput / 2)+ int2str(intput % 2);
 
+}
 int main() {
 	string output=("");
 	int intput, business;
 	while (cin >> intput)
 	{
-		output = ("");
-		business = intput;
-
-		while (1)
-		{
-			if (intput == 1)
-			{
-				output = "1";
-				break;
-			}
-			output = int2str(business % 2) + output;
-			business = (int)business / 2;
-			
-			if (business ==1)
-			{
-				output = int2str(business % 2) + output;
-				break;
-			}
-		}		
-		cout << output << endl;
+		cout << tenCarry2twoCarry(intput) << endl;
 	}
 	//system("PAUSE");
 	return 0;

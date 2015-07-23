@@ -86,7 +86,9 @@ string add(char status, string intput_1, string intput_2) { //加/減/乘法運算
 			tmp1 = intput_1[x];
 			tmp2 = intput_2[0];
 			if (tmp1 - '0' == 0) {
-				output.insert(0, "0");
+				output.insert(0, int2str(sum % 10));
+				sum /= 10;
+				//output.insert(0, "0");
 				//cout << "有執行";
 				continue;
 			}
@@ -203,99 +205,62 @@ int comparison_of_bit_size(string intput_1, string intput_2) {  //除法運算時，比
 	}
 
 }
+string intput_2_ori;
 string exc(string intput_1,string intput_2){  //除法運算
-	string output=("");
-	string tmp, surplus;
-	char tmp1, tmp2;
-	int bit = intput_1.size() - intput_2.size();
-	int check;
-	string ori = intput_2;
-	if (comparison_of_bit_size(intput_1, intput_2)==1)	//舉例:  1234 / 12  第1位數大於第2位數時進入
-	{
-		if (bit == 0) {	//舉例:  1234 / 1111  兩位數相同，但第2位數較大時進入
-			for (int i = 9; i > 0; i--) {
-				if (i == 1) {
-					tmp = add('-', intput_1, intput_2);
-					bit = tmp.size();
-					if (tmp[0] == '0')
-						return "1";
-					if (bit<intput_2.size())
-						return "1";
-					if (bit == intput_2.size() && (intput_2[0] - '0')>(tmp[0] - '0'))
-						return "1";
-				}
-				else {
-					tmp = mult(intput_2, int2str(i));
-					if (comparison_of_bit_size(tmp, intput_1)==0)
-						return int2str(i);
-					else if (comparison_of_bit_size(tmp, intput_1) == 1)
-						continue;
-					else if (comparison_of_bit_size(tmp, intput_1) == 2)
-						return int2str(i);
-
-				}
-			}
-		}
-		else {	//舉例:  1234 / 11  兩位數不相同，但第1位數較大時進入
-			supplement(bit, intput_2.size(), &intput_2);	//舉例:  1234 / 11 ←捕兩個0進去，等於:1234/1100
-			//cout << "intput_2:" << intput_2 <<endl;
-			if (intput_1.size()== intput_2.size() && (intput_1[0]-'0')<(intput_2[0] - '0'))	//舉例:  1234/1400  第2位數因為補0後大過第1位數，所以刪除一個0，變成 1234/140
-				intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
-			if (comparison_of_bit_size(intput_1, intput_2)==1)	//舉例: 1234/140  開始進行除法運算
-			{
-				
-				for (int i = 0; i <= bit; i++)
-				{
-					check = 1;
-					for (int y = 10; y > 0; y--)		//舉例: 1234/140  y=10  140*y=1400(不合)，y=9  140*y=1260(不合)，y=8  140*y=1120(合)  1234-1120=114  將第一個數改為114繼續運算下去。
-					{
-						tmp = mult(intput_2, int2str(y));
-						//cout <<"value:"<< tmp <<"y:"<<y<< endl;
-						if (comparison_of_bit_size(tmp, intput_1)==1)
-						{
-							if (intput_1.size()== ori.size() && comparison_of_bit_size(intput_1, ori) == 2) {
-								supplement(bit-i-1, output.size(), &output);
-								return output;
-								break;
-							}
-							continue;
-						}
-						else// 
-						{
-
-							intput_1 = add('-', intput_1, tmp);
-							output = output + int2str(y);
-							check = 0;
-							//cout << "剩餘:" << intput_1 << "商:" << output <<"-"<<y <<endl;
-							break;
-						}
-						//else if(comparison_of_bit_size(tmp, intput_1) == 0)  //加速運算，不過沒有使用
-						//{
-						//	cout << "OK:";
-						//	supplement(bit-i, output.size(), &output);
-						//	return int2str(y) + output;
-						//}
-					}
-					if(check==1)	//因為第2個數有借0給他，所以運算完後要補到結果去
-						output = output +"0";
+	string tmp;
+	if (comparison_of_bit_size(intput_1, intput_2) == 1) {
+		int bit = intput_1.size() - intput_2.size();
+		supplement(bit, intput_2.size(), &intput_2);
+		if (comparison_of_bit_size(intput_1, intput_2) == 2)	//舉例:  1234/1400  第2位數因為補0後大過第1位數，所以刪除一個0，變成 1234/140
+			intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
+		//cout << "intput_1:" << intput_1 << "intput_2:" << intput_2 << endl;
+		for (int i = 10; i > 0; i--)
+		{
+			tmp=mult(intput_2, int2str(i));
+			//cout <<"i:"<<i<<"intput_1:" << intput_1 <<"tmp:" << tmp << endl;
+			if (comparison_of_bit_size(intput_1,tmp)==1){
+				intput_1=add('-', intput_1, tmp);
+				//cout <<"除數:"<< intput_2 << "商:" << i << "餘數:"<<intput_1 << endl;
+				if (comparison_of_bit_size(intput_2_ori, intput_2)==2) {
 					intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
+					return int2str(i)+exc(intput_1, intput_2);
 				}
-				return output;
+				else if (comparison_of_bit_size(intput_2_ori, intput_2) == 0) {
+					return int2str(i);
+				}
 			}
-			else if(comparison_of_bit_size(intput_1, intput_2) == 0){	//舉例:  1100 / 11  補兩個0後 剛好和1100相同，所以直接印出結果
-				supplement(bit, output.size(), &output);
-				return "1" + output;
+			else if (comparison_of_bit_size(intput_1, tmp) == 0) {
+				//cout << "兩數相同:" << i << endl;
+				intput_1 = add('-', intput_1, tmp);
+				if (comparison_of_bit_size(intput_2_ori, intput_2) == 2) {
+					intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
+					return int2str(i) + exc(intput_1, intput_2);
+				}
+				return int2str(i);
 			}
+			else if (comparison_of_bit_size(intput_1, tmp) == 2) {
+				//cout << "跳過(不符):" << i << endl;
+				continue;
+			}
+
 		}
 	}
-	else if (comparison_of_bit_size(intput_1, intput_2) == 2)	//舉例: 1234/9999  結果商為0
-	{
+	else if (comparison_of_bit_size(intput_1, intput_2) == 2) {
+		if (comparison_of_bit_size(intput_2_ori, intput_2) == 2) {
+			intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
+			return "0"+exc(intput_1, intput_2);
+		}
 		return "0";
 	}
-	else {	//舉例: 9999/9999  結果商為1
+	else if (comparison_of_bit_size(intput_1, intput_2) == 0) {
+		if (comparison_of_bit_size(intput_2_ori, intput_2) == 2) {
+			intput_2 = intput_2.assign(intput_2, 0, intput_2.size() - 1);
+			return exc(intput_1, intput_2);
+		}
 		return "1";
 	}
- }
+
+}
 //主程式
 
 int main() {
@@ -329,6 +294,7 @@ int main() {
 				cout << add('-', intput_1, intput_2) << endl;
 			break;
 		case '/':
+			intput_2_ori = intput_2;
 			cout << exc(intput_1, intput_2) << endl;
 			break;
 		}
@@ -340,18 +306,29 @@ int main() {
 }
 
 //測試用程式
- /*
+/*
 int main() {
-
-	for (int i =0 ; i <2147483647; i++)
+	//cout << int2str(200);
+	string intput1, intput2;
+	int output,tmp_auto;
+	for (int i =1 ; i <2147483647; i++)
 	{
-		if (str2int(exc( int2str(i), int2str(10)))== (int)(i / 10))
+		for (int y = 1; y <= 10; y++)
 		{
-			cout << "正常" <<i<<"-"<< exc(int2str(i), int2str(10)) <<"-"<< (int)(i / 10) <<endl;
-		}
-		else {
-			cout << "異常:" << i << "-" << exc(int2str(i), int2str(10)) << "-" << (int)(i / 10) << endl;
-			break;
+			intput1 = int2str(123 * i);
+			intput2 = int2str(y);
+			intput_2_ori = intput2;
+			output = str2int(exc(intput1, intput2));
+			tmp_auto = (int)((123 * i) / y);
+			if (output == tmp_auto)
+			{
+				cout << "正常" << i << "-" << "-" << output << endl;
+			}
+			else {
+				cout << "異常:" << i << "-" << output << "-" << tmp_auto << endl;
+				cout << "intput1:" << intput1 << "intput2:" << intput2 << endl;
+				system("PAUSE");
+			}
 		}
 		
 	}

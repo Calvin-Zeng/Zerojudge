@@ -6,16 +6,17 @@ void tenCarry2twoCarry(int intput,char *output) {
 	{
 		if (intput % 2 == 0) {
 			output[i] = '0';
+			output[i+1] = '\0';
 			break;
 		}
-			
-		 sprintf(&output[i], "%d", intput%2);
-		 intput /= 2;
+		 //sprintf(&output[i], "%d", intput%2);
+		output[i] = '1';
+		intput=intput >> 1;
 	}
 }
 int main()
 {
-	int intput,carry,carry_sum,len;
+	int intput,carry_sum,len;
 	char twoCarry[100];
 	while (scanf("%d",&intput) == 1){
 		if (intput == 0)
@@ -24,15 +25,11 @@ int main()
 		tenCarry2twoCarry(intput,twoCarry);
 		//printf("%s:%d\n", twoCarry, strlen(twoCarry));
 		len = strlen(twoCarry);
-		carry = 0;
 		carry_sum = 0;
 		if ((twoCarry[0] - '0') == 1) {
 			for (int i =0 ; i <len; i++){
-				if ((twoCarry[i] - '0') == 1) {
+				if ((twoCarry[i] - '0') == 1) 
 					carry_sum++;
-					carry = 1;
-
-				}
 				else
 					break;
 			}
